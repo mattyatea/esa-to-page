@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function Error({
   error,
@@ -15,7 +17,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <>
+      <Header />
+      <div className="flex-1 flex items-center justify-center bg-background px-4">
       <div className="text-center max-w-md">
         <div className="bg-card rounded-xl shadow-lg border border-border p-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -49,6 +53,8 @@ export default function Error({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }

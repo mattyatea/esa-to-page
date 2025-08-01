@@ -68,7 +68,7 @@ export default async function ArticlePage({ params }: PageProps) {
     }
   }
 
-  return <ArticleRenderer article={esaPost} slug={slug} />;
+  return <ArticleRenderer article={esaPost} />;
 }
 
 export async function generateMetadata({ params }: PageProps) {

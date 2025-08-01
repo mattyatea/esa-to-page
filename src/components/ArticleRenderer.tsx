@@ -1,15 +1,17 @@
 import { EsaPost } from '@/types/esa';
 import Image from 'next/image';
-import RefreshButton from './RefreshButton';
+import Header from './Header';
+import Footer from './Footer';
 
 interface ArticleRendererProps {
   article: EsaPost;
-  slug?: string;
 }
 
-export default function ArticleRenderer({ article, slug }: ArticleRendererProps) {
+export default function ArticleRenderer({ article }: ArticleRendererProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Header />
+      <div className="flex-1 bg-background">
       <article className="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
         <header className="mb-12">
           <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
@@ -102,14 +104,11 @@ export default function ArticleRenderer({ article, slug }: ArticleRendererProps)
         </div>
 
         <footer className="pt-8 border-t border-border">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">Powered by esa to page</p>
-            {slug && (
-              <RefreshButton slug={slug} className="shadow-sm" />
-            )}
-          </div>
+          <p className="text-sm text-muted-foreground text-center">Powered by esa to page</p>
         </footer>
       </article>
-    </div>
+      </div>
+      <Footer showAdminLink={false} />
+    </>
   );
 }

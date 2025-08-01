@@ -1,8 +1,12 @@
 import Link from 'next/link';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <>
+      <Header />
+      <div className="flex-1 flex items-center justify-center bg-background px-4">
       <div className="text-center max-w-md">
         <div className="relative">
           <h1 className="text-8xl md:text-9xl font-bold text-primary/20">404</h1>
@@ -28,6 +32,8 @@ export default function NotFound() {
           </Link>
         </div>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
