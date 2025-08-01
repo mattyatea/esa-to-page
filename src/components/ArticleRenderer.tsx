@@ -2,14 +2,19 @@ import { EsaPost } from '@/types/esa';
 import Image from 'next/image';
 import Header from './Header';
 import Footer from './Footer';
+import CodeFontLoader from './CodeFontLoader';
 
 interface ArticleRendererProps {
   article: EsaPost;
 }
 
 export default function ArticleRenderer({ article }: ArticleRendererProps) {
+  // Check if article contains code blocks
+  const hasCodeBlocks = article.body_html.includes('<code') || article.body_html.includes('<pre');
+  
   return (
     <>
+      {hasCodeBlocks && <CodeFontLoader />}
       <Header />
       <div className="flex-1 bg-background">
       <article className="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
@@ -82,27 +87,9 @@ export default function ArticleRenderer({ article }: ArticleRendererProps) {
             </div>
           )}
         </header>
-
-        <div className="bg-card rounded-xl p-6 md:p-10 shadow-sm border border-border mb-8">
-          <div 
-            className="prose prose-lg max-w-none dark:prose-invert
-              prose-headings:text-foreground prose-headings:font-bold
-              prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
-              prose-p:text-muted-foreground prose-p:leading-relaxed
-              prose-a:text-primary hover:prose-a:text-primary/80 prose-a:no-underline hover:prose-a:underline
-              prose-strong:text-foreground
-              prose-code:text-primary prose-code:bg-secondary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm
-              prose-pre:bg-secondary prose-pre:border prose-pre:border-border prose-pre:shadow-inner
-              prose-img:rounded-lg prose-img:shadow-lg prose-img:border prose-img:border-border
-              prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground
-              prose-ul:list-disc prose-ol:list-decimal
-              prose-li:text-muted-foreground
-              prose-table:border-collapse prose-th:border prose-th:border-border prose-th:p-2 prose-th:bg-secondary
-              prose-td:border prose-td:border-border prose-td:p-2"
-            dangerouslySetInnerHTML={{ __html: article.body_html }}
-          />
-        </div>
-
+          <div className="bg-card rounded-xl p-6 md:p-10 shadow-sm border border-border mb-8">
+            <div className="article-content" dangerouslySetInnerHTML={{ __html: article.body_html }} />
+          </div>
         <footer className="pt-8 border-t border-border">
           <p className="text-sm text-muted-foreground text-center">Powered by esa to page</p>
         </footer>
