@@ -1,62 +1,198 @@
-# Next.js Framework Starter
+# esa to page
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/next-starter-template)
+[esa.io](https://esa.io) の記事を外部に公開するための Next.js アプリケーション。Cloudflare Workers で動作します。
 
-<!-- dash-content-start -->
+## 概要
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). It's deployed on Cloudflare Workers as a [static website](https://developers.cloudflare.com/workers/static-assets/).
+esa to page を使用すると、プライベートな esa ワークスペースから選択した記事のみを一般公開できます。社内ドキュメント、ブログ記事、ナレッジベースなどを外部に共有したいチームに最適です。
 
-This template uses [OpenNext](https://opennext.js.org/) via the [OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare), which works by taking the Next.js build output and transforming it, so that it can run in Cloudflare Workers.
+### 主な機能
 
-<!-- dash-content-end -->
+- 🚀 **選択的公開** - 公開したい esa 記事のみを選択
+- ⚡ **エッジデプロイ** - Cloudflare Workers でグローバルに高速配信
+- 🔒 **OAuth 認証** - esa OAuth による安全な管理者アクセス
+- 💾 **スマートキャッシング** - KV ベースの効率的なキャッシュ
+- 📱 **レスポンシブデザイン** - あらゆるデバイスで美しく表示
+- 🎨 **Markdown 対応** - esa の Markdown を完全サポート
+- 🔄 **リアルタイム更新** - 記事をオンデマンドで更新
 
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
+## 技術スタック
+
+- **フレームワーク**: Next.js 15（App Router）
+- **デプロイ**: OpenNext 経由で Cloudflare Workers
+- **データベース**: Cloudflare D1
+- **キャッシュ**: Cloudflare KV
+- **スタイリング**: Tailwind CSS v4
+- **言語**: TypeScript
+
+## 必要要件
+
+- Node.js 18 以上と npm
+- Cloudflare アカウント
+- API アクセス可能な esa.io ワークスペース
+- Wrangler CLI (`npm install -g wrangler`)
+
+## クイックスタート
+
+### 1. クローンとインストール
 
 ```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/next-starter-template
-```
-
-A live public deployment of this template is available at [https://next-starter-template.templates.workers.dev](https://next-starter-template.templates.workers.dev)
-
-## Getting Started
-
-First, run:
-
-```bash
+git clone https://github.com/mattyatea/esa-to-page.git
+cd esa-to-page
 npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
 ```
 
-Then run the development server (using the package manager of your choice):
+### 2. Cloudflare リソースの作成
 
 ```bash
-npm run dev
+# D1 データベースを作成
+wrangler d1 create esa-to-page
+
+# KV namespace を作成
+wrangler kv:namespace create "ESA_CACHE"
+
+# データベーススキーマを適用
+wrangler d1 execute esa-to-page --file=./schema.sql
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. wrangler.jsonc の設定
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`wrangler.jsonc` で作成したリソースの ID を更新：
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```jsonc
+{
+  "d1_databases": [{
+    "database_id": "YOUR_DATABASE_ID"
+  }],
+  "kv_namespaces": [{
+    "id": "YOUR_KV_NAMESPACE_ID"
+  }],
+  "vars": {
+    "ESA_WORKSPACE": "your-workspace-name"
+  }
+}
+```
 
-## Deploying To Production
+### 4. esa OAuth の設定
 
-| Command                           | Action                                       |
-| :-------------------------------- | :------------------------------------------- |
-| `npm run build`                   | Build your production site                   |
-| `npm run preview`                 | Preview your build locally, before deploying |
-| `npm run build && npm run deploy` | Deploy your production site to Cloudflare    |
+1. esa ワークスペースの設定画面へアクセス
+2. 新しい OAuth アプリケーションを作成
+3. リダイレクト URI を設定: `https://your-domain.com/api/auth/callback`
+4. Client ID と Secret をメモ
 
-## Learn More
+### 5. シークレットの設定
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# esa API アクセストークン
+wrangler secret put ESA_ACCESS_TOKEN
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# OAuth クレデンシャル
+wrangler secret put ESA_CLIENT_ID
+wrangler secret put ESA_CLIENT_SECRET
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+# セッションシークレット（生成コマンド: openssl rand -base64 32）
+wrangler secret put SESSION_SECRET
+```
+
+### 6. デプロイ
+
+```bash
+npm run deploy
+```
+
+## 使い方
+
+### 管理画面
+
+1. `https://your-domain.com/admin` にアクセス
+2. esa アカウントでサインイン
+3. esa の URL を貼り付けて、スラグを選択して記事を追加
+4. ダッシュボードから公開記事を管理
+
+### 公開記事
+
+公開された記事は以下の URL でアクセスできます：
+```
+https://your-domain.com/[slug]
+```
+
+## 開発
+
+```bash
+# ローカル開発（D1/KV なし）
+npm run dev
+
+# Cloudflare 環境でプレビュー
+npm run preview
+
+# 型チェック
+npm run check
+
+# リンティング
+npm run lint
+```
+
+## プロジェクト構造
+
+```
+src/
+├── app/                 # Next.js App Router
+│   ├── api/            # API ルート
+│   ├── admin/          # 管理画面
+│   └── [slug]/         # 記事ページ
+├── components/         # React コンポーネント
+├── lib/               # コアユーティリティ
+│   ├── auth.ts        # 認証
+│   ├── cache.ts       # KV キャッシング
+│   ├── db.ts          # データベース操作
+│   └── esa-api.ts     # esa API クライアント
+└── types/             # TypeScript 型定義
+```
+
+## 環境変数
+
+| 変数名 | 説明 | 必須 |
+|--------|------|------|
+| `ESA_ACCESS_TOKEN` | esa API アクセストークン | Yes |
+| `ESA_CLIENT_ID` | OAuth アプリケーション ID | Yes |
+| `ESA_CLIENT_SECRET` | OAuth アプリケーションシークレット | Yes |
+| `SESSION_SECRET` | セッション暗号化キー | Yes |
+| `ESA_WORKSPACE` | esa ワークスペース名 | Yes |
+
+## API エンドポイント
+
+- `GET /api/articles` - 公開記事一覧を取得
+- `POST /api/articles` - 新しい記事を公開
+- `PUT /api/articles/[id]` - 記事設定を更新
+- `DELETE /api/articles/[id]` - 記事の公開を取り消し
+- `POST /api/articles/refresh/[slug]` - 記事キャッシュを更新
+
+## キャッシュ戦略
+
+記事は Cloudflare KV に 24 時間キャッシュされます。以下の場合に自動的に無効化されます：
+- 管理画面から記事が更新された時
+- 手動でリフレッシュがトリガーされた時
+- 記事の公開が取り消された時
+
+## セキュリティ
+
+- 管理者アクセスには esa OAuth 認証が必要
+- セッショントークンは暗号化され httpOnly で保護
+- API エンドポイントは認証ミドルウェアで保護
+- すべてのデータは Cloudflare アカウント内に保存
+
+## コントリビューション
+
+開発ガイドラインについては [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+## ライセンス
+
+MIT
+
+## クレジット
+
+以下の技術で構築されています：
+- [Next.js](https://nextjs.org)
+- [Cloudflare Workers](https://workers.cloudflare.com)
+- [OpenNext](https://opennext.js.org)
+- [esa.io](https://esa.io)
