@@ -2,6 +2,8 @@
 
 [esa.io](https://esa.io) の記事を外部に公開するための Next.js アプリケーション。Cloudflare Workers で動作します。
 
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/mattyatea/esa-to-page)
+
 ## 概要
 
 esa to page を使用すると、プライベートな esa ワークスペースから選択した記事のみを一般公開できます。社内ドキュメント、ブログ記事、ナレッジベースなどを外部に共有したいチームに最適です。
